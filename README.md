@@ -192,7 +192,6 @@ To add a new feature:
 
 ## 📚 Learn More
 
-- Review implementation workflow: See `BUILDING.md`
 - Understand Spec-Kit: [github.com/github/spec-kit](https://github.com/github/spec-kit)
 - Review Feature 001 spec: `specs/001-build-app-with/spec.md`
 - Review Feature 002 spec: `specs/002-do-not-show/spec.md`

@@ -6,13 +6,16 @@ A complete web application that helps condo managers and residents track residen
 
 ## 💡 Why No Implementation Code?
 
+This repository represents a **paradigm shift in software development** - we focus on **what customers and users need** instead of **how to implement it**.
+
 This repository intentionally contains **only specifications** to:
 
-1. **Demonstrate Spec-Driven Development**: Show how AI can build complete applications from specifications
-2. **Reduce Repository Size**: No compiled code or dependencies
-3. **Version Control Clarity**: Only source of truth (specs) are tracked
+1. **Customer-First Development**: Focus on user requirements and business value, not technical implementation details
+2. **AI-Powered Implementation**: Let AI handle the "how" while humans focus on the "what" and "why"
+3. **Reduce Repository Size**: No compiled code or dependencies cluttering the repository
+4. **Version Control Clarity**: Only the source of truth (specs) are tracked, not generated artifacts
 
-The complete application (backend, frontend, database, Docker configs) will be generated when you build from these specs.
+The complete application (backend, frontend, database, Docker configs) will be generated when you build from these specs using AI assistance.
 
 ## 🎯 Purpose
 
@@ -38,6 +41,14 @@ The Condo Management System includes:
 
 **Tech Stack**: These specs use Rust (Axum), SQLite, and vanilla JavaScript, but you can generate the code using any stack you're more familiar with by specifying it during the `/plan` step.
 
+### Explore Current Specifications
+
+To understand what you'll be building, explore the current specifications:
+- **Main Application**: [`specs/001-build-app-with/spec.md`](specs/001-build-app-with/spec.md) - Core condo management features
+- **Status Notifications**: [`specs/002-do-not-show/spec.md`](specs/002-do-not-show/spec.md) - Enhanced UX without popups
+
+Each spec file contains detailed requirements, user stories, and acceptance criteria that will guide the implementation.
+
 ## 🚀 How to Build the Project
 
 ### Prerequisites
@@ -48,7 +59,7 @@ The Condo Management System includes:
 
 2. **Clone the Repository**:
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/aospan/condo-manager.git
    cd condo-manager
    ```
 
@@ -56,21 +67,17 @@ The Condo Management System includes:
    - Open Cursor application
    - Use File > Open Folder and select the `condo-manager` directory
 
-4. **Install Development Tools**:
-   - Cursor IDE will prompt you to install any missing tools during the build process
-   - Cursor handles tool installation automatically based on your chosen tech stack
-
 Note: The Spec-Kit framework (`.specify/` and `.cursor/` directories) is already included. See `SETUP.md` for updating to the latest version from [github.com/github/spec-kit](https://github.com/github/spec-kit).
 
 ### Building All Features
 
 1. **Generate Implementation Plans**:
-   - In Cursor IDE, open the command palette (Cmd/Ctrl+Shift+P)
+   - In Cursor IDE, open the chat window (Cmd/Ctrl+L)
    - Type: `/plan`
    - Review the generated implementation plan
 
 2. **Implement All Features**:
-   - In Cursor IDE command palette:
+   - In Cursor IDE chat window:
    - Type: `/implement`
    - Cursor will build the complete application with all features
    - This generates all backend code, frontend code, database, configs, and tests
@@ -78,12 +85,13 @@ Note: The Spec-Kit framework (`.specify/` and `.cursor/` directories) is already
 3. **Start the Application**:
    - Simply ask Cursor in plain English: "start application"
    - Cursor will run the appropriate commands (docker-compose, cargo run, etc.)
-   - Or manually run: `docker-compose up --build`
 
 4. **Access and Test**:
    - Open browser to `http://localhost:3000`
    - Test resident management, guest registration, parking permits
    - Verify embedded status messages (no popup dialogs!)
+
+🎉 **Congratulations!** You now have a fully functional Condo Management System. Poke around, explore the features, and feel free to add your own requirements to customize the system to your specific needs using the `/specify` command in Cursor IDE.
 
 ## 🛠️ Spec-Kit Framework
 
@@ -103,22 +111,28 @@ User Idea → /specify → spec.md → /plan → design docs → /implement → 
 
 ## 📖 Example: Adding a New Feature
 
-```bash
-# 1. In Cursor IDE, describe your feature
-/specify add email notifications when guest permits expire
+1. **In Cursor IDE chat window**, describe your feature:
+   ```
+   /specify add email notifications when guest permits expire
+   ```
 
-# 2. Review and clarify the generated spec
-/clarify
-# Answer questions about notification requirements
+2. **Review and clarify** the generated spec:
+   ```
+   /clarify
+   ```
+   Answer questions about notification requirements
 
-# 3. Generate implementation plan
-/plan
+3. **Generate implementation plan**:
+   ```
+   /plan
+   ```
 
-# 4. Review the plan, then implement
-/implement
+4. **Review the plan, then implement**:
+   ```
+   /implement
+   ```
 
-# Result: Fully implemented email notification feature!
-```
+**Result**: Fully implemented email notification feature!
 
 ## 🔍 Spec File Contents
 

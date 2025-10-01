@@ -1,0 +1,323 @@
+openapi: 3.0.3
+info:
+  title: Status Notification API
+  description: API for managing embedded status notifications in the condo management system
+  version: 1.0.0
+  contact:
+    name: Condo Manager API
+    url: https://example.com/support
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+
+paths:
+  /status/messages:
+    post:
+      summary: Create a new status message
+      description: Creates a new status message to be displayed in the UI
+      operationId: createStatusMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStatusMessageRequest'
+            examples:
+              success_message:
+                summary: Success message
+                value:
+                  type: "success"
+                  title: "Resident Created"
+                  message: "John Doe has been successfully added as a resident."
+                  dismissible: true
+                  autoDismiss: true
+                  dismissTimeout: 5000
+              error_message:
+                summary: Error message
+                value:
+                  type: "error"
+                  title: "Validation Error"
+                  message: "Please check the required fields and try again."
+                  dismissible: true
+                  autoDismiss: false
+                  actions:
+                    - label: "Retry"
+                      action: "retry"
+                      style: "primary"
+      responses:
+        '201':
+          description: Status message created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusMessage'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /status/messages/{messageId}:
+    get:
+      summary: Get a status message
+      description: Retrieves a specific status message by ID
+      operationId: getStatusMessage
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the status message
+      responses:
+        '200':
+          description: Status message found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusMessage'
+        '404':
+          description: Status message not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Dismiss a status message
+      description: Manually dismisses a status message
+      operationId: dismissStatusMessage
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the status message
+      responses:
+        '200':
+          description: Status message dismissed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusMessage'
+        '404':
+          description: Status message not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /status/messages/current:
+    get:
+      summary: Get current status message
+      description: Retrieves the currently displayed status message
+      operationId: getCurrentStatusMessage
+      responses:
+        '200':
+          description: Current status message found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusMessage'
+        '204':
+          description: No current status message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Clear current status message
+      description: Clears the currently displayed status message
+      operationId: clearCurrentStatusMessage
+      responses:
+        '200':
+          description: Current status message cleared successfully
+        '204':
+          description: No current status message to clear
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    StatusMessage:
+      type: object
+      required:
+        - id
+        - type
+        - message
+        - timestamp
+        - dismissible
+        - autoDismiss
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the status message
+          example: "msg_1234567890"
+        type:
+          type: string
+          enum: [success, error, info, warning]
+          description: Type of status message
+          example: "success"
+        title:
+          type: string
+          description: Optional short title for the message
+          example: "Operation Successful"
+        message:
+          type: string
+          description: Main message content
+          example: "The resident has been successfully created."
+        timestamp:
+          type: string
+          format: date-time
+          description: When the message was created
+          example: "2025-09-29T10:30:00Z"
+        dismissible:
+          type: boolean
+          description: Whether the user can manually dismiss the message
+          example: true
+        autoDismiss:
+          type: boolean
+          description: Whether the message auto-dismisses after timeout
+          example: true
+        dismissTimeout:
+          type: integer
+          minimum: 0
+          description: Auto-dismiss timeout in milliseconds
+          example: 5000
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActionButton'
+          description: Optional action buttons for the message
+        dismissed:
+          type: boolean
+          description: Whether the message has been dismissed
+          example: false
+
+    ActionButton:
+      type: object
+      required:
+        - label
+        - action
+        - style
+      properties:
+        label:
+          type: string
+          description: Text displayed on the button
+          example: "Retry"
+        action:
+          type: string
+          description: Action identifier for the button
+          example: "retry"
+        style:
+          type: string
+          enum: [primary, secondary, danger]
+          description: Visual style of the button
+          example: "primary"
+        callback:
+          type: string
+          description: Optional callback function name
+          example: "handleRetry"
+
+    CreateStatusMessageRequest:
+      type: object
+      required:
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          enum: [success, error, info, warning]
+          description: Type of status message
+          example: "success"
+        title:
+          type: string
+          description: Optional short title for the message
+          example: "Operation Successful"
+        message:
+          type: string
+          description: Main message content
+          example: "The resident has been successfully created."
+        dismissible:
+          type: boolean
+          default: true
+          description: Whether the user can manually dismiss the message
+          example: true
+        autoDismiss:
+          type: boolean
+          default: true
+          description: Whether the message auto-dismisses after timeout
+          example: true
+        dismissTimeout:
+          type: integer
+          minimum: 0
+          default: 5000
+          description: Auto-dismiss timeout in milliseconds
+          example: 5000
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActionButton'
+          description: Optional action buttons for the message
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error type identifier
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Invalid request data provided"
+        details:
+          type: object
+          description: Additional error details
+          example:
+            field: "email"
+            reason: "Invalid email format"
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - ApiKeyAuth: []
+
+tags:
+  - name: Status Messages
+    description: Operations related to status message management

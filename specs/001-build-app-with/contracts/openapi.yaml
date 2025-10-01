@@ -1,0 +1,898 @@
+openapi: 3.0.3
+info:
+  title: Condo Management API
+  description: API for managing condo residents, guests, and parking permits
+  version: 1.0.0
+  contact:
+    name: Condo Management System
+    email: admin@condo-management.local
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  - url: https://api.condo-management.local
+    description: Production server
+
+paths:
+  # Resident Management
+  /residents:
+    get:
+      summary: List all residents
+      description: Retrieve a paginated list of all residents
+      tags:
+        - Residents
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          description: Search term for name or address
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of residents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Resident'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create new resident
+      description: Create a new resident record
+      tags:
+        - Residents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateResidentRequest'
+      responses:
+        '201':
+          description: Resident created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resident'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /residents/{id}:
+    get:
+      summary: Get resident by ID
+      description: Retrieve a specific resident by ID
+      tags:
+        - Residents
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Resident ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Resident details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resident'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update resident
+      description: Update an existing resident
+      tags:
+        - Residents
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Resident ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateResidentRequest'
+      responses:
+        '200':
+          description: Resident updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resident'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete resident
+      description: Delete a resident and all associated data
+      tags:
+        - Residents
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Resident ID
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Resident deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Guest Management
+  /guests:
+    get:
+      summary: List all guests
+      description: Retrieve a paginated list of all guests
+      tags:
+        - Guests
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          description: Search term for name
+          required: false
+          schema:
+            type: string
+        - name: resident_id
+          in: query
+          description: Filter by resident ID
+          required: false
+          schema:
+            type: integer
+        - name: active_only
+          in: query
+          description: Show only active (non-expired) guests
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: List of guests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Guest'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create new guest
+      description: Create a new guest registration
+      tags:
+        - Guests
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGuestRequest'
+      responses:
+        '201':
+          description: Guest created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /guests/{id}:
+    get:
+      summary: Get guest by ID
+      description: Retrieve a specific guest by ID
+      tags:
+        - Guests
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Guest ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Guest details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update guest
+      description: Update an existing guest
+      tags:
+        - Guests
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Guest ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGuestRequest'
+      responses:
+        '200':
+          description: Guest updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete guest
+      description: Delete a guest and all associated data
+      tags:
+        - Guests
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Guest ID
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Guest deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Vehicle Management
+  /residents/{id}/vehicles:
+    get:
+      summary: Get resident vehicles
+      description: Retrieve all vehicles for a specific resident
+      tags:
+        - Vehicles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Resident ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of vehicles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vehicle'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Add vehicle to resident
+      description: Add a new vehicle to a resident
+      tags:
+        - Vehicles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Resident ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVehicleRequest'
+      responses:
+        '201':
+          description: Vehicle added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /guests/{id}/vehicles:
+    get:
+      summary: Get guest vehicles
+      description: Retrieve all vehicles for a specific guest
+      tags:
+        - Vehicles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Guest ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of vehicles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GuestVehicle'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Add vehicle to guest
+      description: Add a new vehicle to a guest
+      tags:
+        - Vehicles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Guest ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGuestVehicleRequest'
+      responses:
+        '201':
+          description: Vehicle added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestVehicle'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Parking Permit Management
+  /guests/{id}/permit:
+    post:
+      summary: Generate parking permit
+      description: Generate a parking permit for a guest
+      tags:
+        - Permits
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Guest ID
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeneratePermitRequest'
+      responses:
+        '201':
+          description: Parking permit generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParkingPermit'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /permit/{permit_number}/print:
+    get:
+      summary: Print parking permit
+      description: Get printable version of a parking permit
+      tags:
+        - Permits
+      parameters:
+        - name: permit_number
+          in: path
+          required: true
+          description: Permit number
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Printable permit
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    Resident:
+      type: object
+      required:
+        - id
+        - name
+        - address
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          description: Unique resident identifier
+        name:
+          type: string
+          description: Resident's full name
+          minLength: 2
+        address:
+          type: string
+          description: Unit number and building address
+        phone:
+          type: string
+          nullable: true
+          description: Contact phone number
+        email:
+          type: string
+          nullable: true
+          description: Contact email address
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    CreateResidentRequest:
+      type: object
+      required:
+        - name
+        - address
+      properties:
+        name:
+          type: string
+          description: Resident's full name
+          minLength: 2
+        address:
+          type: string
+          description: Unit number and building address
+        phone:
+          type: string
+          description: Contact phone number
+        email:
+          type: string
+          description: Contact email address
+
+    UpdateResidentRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Resident's full name
+          minLength: 2
+        address:
+          type: string
+          description: Unit number and building address
+        phone:
+          type: string
+          description: Contact phone number
+        email:
+          type: string
+          description: Contact email address
+
+    Guest:
+      type: object
+      required:
+        - id
+        - resident_id
+        - name
+        - valid_until
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          description: Unique guest identifier
+        resident_id:
+          type: integer
+          description: ID of the resident who registered this guest
+        name:
+          type: string
+          description: Guest's full name
+          minLength: 2
+        phone:
+          type: string
+          nullable: true
+          description: Contact phone number
+        valid_until:
+          type: string
+          format: date-time
+          description: Permit expiration time
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    CreateGuestRequest:
+      type: object
+      required:
+        - resident_id
+        - name
+      properties:
+        resident_id:
+          type: integer
+          description: ID of the resident registering the guest
+        name:
+          type: string
+          description: Guest's full name
+          minLength: 2
+        phone:
+          type: string
+          description: Contact phone number
+        valid_until:
+          type: string
+          format: date-time
+          description: Permit expiration time (defaults to 12 hours from now)
+
+    UpdateGuestRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Guest's full name
+          minLength: 2
+        phone:
+          type: string
+          description: Contact phone number
+        valid_until:
+          type: string
+          format: date-time
+          description: Permit expiration time
+
+    Vehicle:
+      type: object
+      required:
+        - id
+        - resident_id
+        - license_plate
+        - created_at
+      properties:
+        id:
+          type: integer
+          description: Unique vehicle identifier
+        resident_id:
+          type: integer
+          description: ID of the resident who owns this vehicle
+        license_plate:
+          type: string
+          description: Vehicle license plate
+        make:
+          type: string
+          nullable: true
+          description: Vehicle manufacturer
+        model:
+          type: string
+          nullable: true
+          description: Vehicle model
+        color:
+          type: string
+          nullable: true
+          description: Vehicle color
+        year:
+          type: integer
+          nullable: true
+          description: Vehicle year
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+
+    CreateVehicleRequest:
+      type: object
+      required:
+        - license_plate
+      properties:
+        license_plate:
+          type: string
+          description: Vehicle license plate
+        make:
+          type: string
+          description: Vehicle manufacturer
+        model:
+          type: string
+          description: Vehicle model
+        color:
+          type: string
+          description: Vehicle color
+        year:
+          type: integer
+          description: Vehicle year
+
+    GuestVehicle:
+      type: object
+      required:
+        - id
+        - guest_id
+        - license_plate
+        - created_at
+      properties:
+        id:
+          type: integer
+          description: Unique vehicle identifier
+        guest_id:
+          type: integer
+          description: ID of the guest who owns this vehicle
+        license_plate:
+          type: string
+          description: Vehicle license plate
+        make:
+          type: string
+          nullable: true
+          description: Vehicle manufacturer
+        model:
+          type: string
+          nullable: true
+          description: Vehicle model
+        color:
+          type: string
+          nullable: true
+          description: Vehicle color
+        year:
+          type: integer
+          nullable: true
+          description: Vehicle year
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+
+    CreateGuestVehicleRequest:
+      type: object
+      required:
+        - license_plate
+      properties:
+        license_plate:
+          type: string
+          description: Vehicle license plate
+        make:
+          type: string
+          description: Vehicle manufacturer
+        model:
+          type: string
+          description: Vehicle model
+        color:
+          type: string
+          description: Vehicle color
+        year:
+          type: integer
+          description: Vehicle year
+
+    ParkingPermit:
+      type: object
+      required:
+        - id
+        - guest_id
+        - permit_number
+        - valid_from
+        - valid_until
+        - created_at
+      properties:
+        id:
+          type: integer
+          description: Unique permit identifier
+        guest_id:
+          type: integer
+          description: ID of the guest this permit is for
+        permit_number:
+          type: string
+          description: Unique permit number
+        valid_from:
+          type: string
+          format: date-time
+          description: Permit start time
+        valid_until:
+          type: string
+          format: date-time
+          description: Permit end time
+        printed_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the permit was printed
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+
+    GeneratePermitRequest:
+      type: object
+      properties:
+        valid_from:
+          type: string
+          format: date-time
+          description: Permit start time (defaults to now)
+        valid_until:
+          type: string
+          format: date-time
+          description: Permit end time (defaults to guest valid_until)
+
+    Pagination:
+      type: object
+      required:
+        - page
+        - limit
+        - total
+        - total_pages
+      properties:
+        page:
+          type: integer
+          description: Current page number
+        limit:
+          type: integer
+          description: Items per page
+        total:
+          type: integer
+          description: Total number of items
+        total_pages:
+          type: integer
+          description: Total number of pages
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          description: Additional error details
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "VALIDATION_ERROR"
+            message: "Invalid input data"
+            details:
+              field: "name"
+              reason: "Name must be at least 2 characters"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "NOT_FOUND"
+            message: "Resource not found"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "INTERNAL_ERROR"
+            message: "An unexpected error occurred"
+
+tags:
+  - name: Residents
+    description: Resident management operations
+  - name: Guests
+    description: Guest registration operations
+  - name: Vehicles
+    description: Vehicle management operations
+  - name: Permits
+    description: Parking permit operations

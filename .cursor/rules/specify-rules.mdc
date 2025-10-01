@@ -1,0 +1,28 @@
+# condo-manager Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2025-09-29
+
+## Active Technologies
+- Rust 1.75+ (backend), HTML5/CSS3/ES2020 (frontend) + Axum (web framework), SQLx (database), Askama (templates), Docker (001-build-app-with)
+- JavaScript (ES6+), HTML5, CSS3, Rust 1.90 + Existing frontend (HTML/CSS/JS), Axum backend, SQLite (002-do-not-show)
+- N/A (UI-only feature) (002-do-not-show)
+
+## Project Structure
+```
+backend/
+frontend/
+tests/
+```
+
+## Commands
+cargo test [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLOGIES] cargo clippy
+
+## Code Style
+Rust 1.75+ (backend), HTML5/CSS3/ES2020 (frontend): Follow standard conventions
+
+## Recent Changes
+- 002-do-not-show: Added JavaScript (ES6+), HTML5, CSS3, Rust 1.90 + Existing frontend (HTML/CSS/JS), Axum backend, SQLite
+- 001-build-app-with: Added Rust 1.75+ (backend), HTML5/CSS3/ES2020 (frontend) + Axum (web framework), SQLx (database), Askama (templates), Docker
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->
